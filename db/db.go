@@ -1,17 +1,20 @@
 package db
 
 import (
+	"github.com/go-redis/redis"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 	"github.com/sirupsen/logrus"
 	"sync"
+	"time"
 )
 
-type db struct {
+type DB struct {
 	Mysql *gorm.DB
+	Redis *redis.Client
 }
 
-var dbInstance *db
+var dbInstance *DB
 var dbInstanceOnce sync.Once
 
 func InitDB(mySqlInfo string) {
@@ -23,16 +26,24 @@ func InitDB(mySqlInfo string) {
 				"err": err.Error(),
 			}).Fatal("Mysql init failed.")
 		}
-		dbInstance = &db{
+		redisCli := redis.NewClient(&redis.Options{
+			Addr:               "139.155.46.62:6379",
+			Password:           "",
+			DB:                 0,
+			DialTimeout: 5 * time.Second,
+		})
+		dbInstance = &DB{
 			Mysql: mysqlDB,
+			Redis: redisCli,
 		}
 	})
 }
 
-func GetDB() *db {
+func GetDB() *DB {
 	return dbInstance
 }
 
-func (instance *db) Close() {
+func (instance *DB) Close() {
 	instance.Mysql.Close()
+	instance.Redis.Close()
 }
