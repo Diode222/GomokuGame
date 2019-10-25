@@ -1,6 +1,7 @@
 package db
 
 import (
+	"GomokuGame/app/conf"
 	"github.com/go-redis/redis"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
@@ -23,13 +24,13 @@ func InitDB(mySqlInfo string) {
 		if err != nil {
 			logrus.WithFields(logrus.Fields{
 				"mySqlInfo": mySqlInfo,
-				"err": err.Error(),
+				"err":       err.Error(),
 			}).Fatal("Mysql init failed.")
 		}
 		redisCli := redis.NewClient(&redis.Options{
-			Addr:               "139.155.46.62:6379",
-			Password:           "",
-			DB:                 0,
+			Addr:        conf.REDIS_ADDR,
+			Password:    conf.REDIS_PASSWORD,
+			DB:          conf.REDIS_DB_NAME,
 			DialTimeout: 5 * time.Second,
 		})
 		dbInstance = &DB{

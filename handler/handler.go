@@ -20,8 +20,8 @@ func GetHandler() *handler {
 			UserCtrl: controller.NewUserCtrl(
 				user.NewUserDao(
 					db.GetDB(),
-					),
 				),
+			),
 		}
 	})
 	return h

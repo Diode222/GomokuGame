@@ -81,7 +81,6 @@ func (u *UserDao) availableWarehouseAddr(addr string) bool {
 	return true
 }
 
-
 func (u *UserDao) setUserTokenPairInRedis(userInfo string) string {
 	token := jwt.GetToken()
 	u.DBInstance.Redis.Set(token, userInfo, conf.USER_INFO_TTL)
