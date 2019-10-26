@@ -6,7 +6,7 @@ import (
 
 type UserItem struct {
 	gorm.Model
-	UserName      string `gorm:"not null"`
+	UserName      string `gorm:"primary_key"`
 	Password      string `gorm:"not null"`
 	WarehouseAddr string `gorm:"not null"`
 }
