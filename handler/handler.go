@@ -8,7 +8,8 @@ import (
 )
 
 type handler struct {
-	UserCtrl *controller.UserCtrl
+	UserCtrl      *controller.UserCtrl
+	GameStartCtrl *controller.GameStartCtrl
 }
 
 var h *handler
@@ -22,6 +23,7 @@ func GetHandler() *handler {
 					db.GetDB(),
 				),
 			),
+			GameStartCtrl: controller.NewGameStartCtrl(),
 		}
 	})
 	return h
