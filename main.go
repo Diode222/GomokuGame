@@ -14,6 +14,6 @@ func main() {
 	db.InitDB(sqlInfo)
 	defer db.GetDB().Close()
 	kube.InitClientset()
-	db.GetDB().Mysql.AutoMigrate(&model.UserItem{})
+	db.GetDB().Mysql.AutoMigrate(&model.UserItem{}, &model.MatchResultItem{})
 	router.InitRouter()
 }

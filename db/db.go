@@ -11,6 +11,7 @@ import (
 )
 
 type DB struct {
+	Lock  sync.Locker
 	Mysql *gorm.DB
 	Redis *redis.Client
 }
@@ -34,6 +35,7 @@ func InitDB(mySqlInfo string) {
 			DialTimeout: 5 * time.Second,
 		})
 		dbInstance = &DB{
+			Lock:  &sync.Mutex{},
 			Mysql: mysqlDB,
 			Redis: redisCli,
 		}

@@ -1,4 +1,4 @@
 .idea
 .idea/
-app/conf/mysql_conf.go
-app/conf/redis_conf.go
+#app/conf/mysql_conf.go
+#app/conf/redis_conf.go

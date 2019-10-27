@@ -1,6 +1,7 @@
 package jwt
 
 import (
+	"GomokuGame/app/conf"
 	"github.com/dgrijalva/jwt-go"
 	"time"
 )
@@ -8,7 +9,7 @@ import (
 func GetToken() string {
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := make(jwt.MapClaims)
-	claims["exp"] = time.Now().Add(time.Hour * time.Duration(240)).Unix()
+	claims["exp"] = time.Now().Add(conf.USER_INFO_TTL).Unix()
 	claims["iat"] = time.Now().Unix()
 	token.Claims = claims
 

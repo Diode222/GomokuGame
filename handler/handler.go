@@ -3,6 +3,7 @@ package handler
 import (
 	"GomokuGame/controller"
 	"GomokuGame/dao/gameId"
+	"GomokuGame/dao/gameResult"
 	"GomokuGame/dao/user"
 	"GomokuGame/db"
 	"GomokuGame/kube"
@@ -27,6 +28,8 @@ func GetHandler() *handler {
 			),
 			GameStartCtrl: controller.NewGameStartCtrl(
 				gameId.NewGameIdDao(db.GetDB().Redis),
+				user.NewUserDao(db.GetDB()),
+				gameResult.NewGameResultDao(db.GetDB()),
 				kube.NewKubePodsClient(),
 			),
 		}
