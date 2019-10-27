@@ -20,7 +20,6 @@ func NewResultHandler() *ResultHandler {
 }
 
 func (r *ResultHandler) HandleMessage(msg *nsq.Message) error {
-	logrus.Info("result handlemsg ing...")
 	matchResult := &model.MatchResultNsq{}
 	err := json.Unmarshal(msg.Body, matchResult)
 	if err != nil {
@@ -31,7 +30,6 @@ func (r *ResultHandler) HandleMessage(msg *nsq.Message) error {
 	}
 
 	r.MatchResult = matchResult
-	logrus.Info("result get data.")
 	r.TransFinished <- true
 	return nil
 }

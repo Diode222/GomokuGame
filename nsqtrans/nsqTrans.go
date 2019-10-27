@@ -8,6 +8,8 @@ import (
 	"encoding/json"
 	"github.com/nsqio/go-nsq"
 	"github.com/sirupsen/logrus"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	"net/http"
 	"os"
 	ospath "path"
@@ -29,9 +31,10 @@ type NsqTrans struct {
 	Player2LogFile     *os.File
 	RefereeLogFile     *os.File
 	DBInstance         *db.DB
+	PodClient          corev1.PodInterface
 }
 
-func NewNsqTrans(gameId int64) (*NsqTrans, error) {
+func NewNsqTrans(gameId int64, podClient corev1.PodInterface) (*NsqTrans, error) {
 	gameIdStr := strconv.Itoa(int(gameId))
 	resultTopic := gameIdStr + "_game_result"
 	player1Topic := gameIdStr + "_log_player1"
@@ -131,6 +134,7 @@ func NewNsqTrans(gameId int64) (*NsqTrans, error) {
 		Player2LogFile:     player2LogFile,
 		RefereeLogFile:     refereeLogFile,
 		DBInstance:         db.GetDB(),
+		PodClient:          podClient,
 	}, nil
 }
 
@@ -144,16 +148,15 @@ func (n *NsqTrans) PullGameDataAndStore() {
 		n.ResultConsumer.AddHandler(resultHandler)
 		if err := n.ResultConsumer.ConnectToNSQLookupd(conf.NSQLOOKUPD_ADDR); err != nil {
 			logrus.WithFields(logrus.Fields{
-				"topic": n.GameId + "_game_result",
+				"topic":           n.GameId + "_game_result",
 				"NSQLOOKUPD_ADDR": conf.NSQLOOKUPD_ADDR,
-				"err":   err.Error(),
+				"err":             err.Error(),
 			}).Info("Result nsq consumer connected to nsqLookupd failed.")
 			return
 		}
 		select {
 		case <-resultHandler.TransFinished:
 			gameReulst = resultHandler.MatchResult
-			logrus.Info("resultHandler trans finished" + n.GameId)
 			return
 		case <-time.After(conf.MAX_PULL_DATA_TIME):
 			return
@@ -165,15 +168,14 @@ func (n *NsqTrans) PullGameDataAndStore() {
 		n.Player1Consumer.AddHandler(player1LogHandler)
 		if err := n.Player1Consumer.ConnectToNSQLookupd(conf.NSQLOOKUPD_ADDR); err != nil {
 			logrus.WithFields(logrus.Fields{
-				"topic": n.GameId + "_log_player1",
+				"topic":           n.GameId + "_log_player1",
 				"NSQLOOKUPD_ADDR": conf.NSQLOOKUPD_ADDR,
-				"err":   err.Error(),
+				"err":             err.Error(),
 			}).Info("Player1 log nsq consumer connected to nsqLookupd failed.")
 			return
 		}
 		select {
 		case <-player1LogHandler.TransFinished:
-			logrus.Info("player1LogHandler trans finished" + n.GameId)
 			return
 		case <-time.After(conf.MAX_PULL_DATA_TIME): // game should finish in 5 minutes
 			return
@@ -185,15 +187,14 @@ func (n *NsqTrans) PullGameDataAndStore() {
 		n.Player2Consumer.AddHandler(player2LogHandler)
 		if err := n.Player2Consumer.ConnectToNSQLookupd(conf.NSQLOOKUPD_ADDR); err != nil {
 			logrus.WithFields(logrus.Fields{
-				"topic": n.GameId + "_log_player2",
+				"topic":           n.GameId + "_log_player2",
 				"NSQLOOKUPD_ADDR": conf.NSQLOOKUPD_ADDR,
-				"err":   err.Error(),
+				"err":             err.Error(),
 			}).Info("Player2 log nsq consumer connected to nsqLookupd failed.")
 			return
 		}
 		select {
 		case <-player2LogHandler.TransFinished:
-			logrus.Info("player2LogHandler trans finished" + n.GameId)
 			return
 		case <-time.After(conf.MAX_PULL_DATA_TIME):
 			return
@@ -205,15 +206,14 @@ func (n *NsqTrans) PullGameDataAndStore() {
 		n.RefereeConsumer.AddHandler(refereeLogHandler)
 		if err := n.RefereeConsumer.ConnectToNSQLookupd(conf.NSQLOOKUPD_ADDR); err != nil {
 			logrus.WithFields(logrus.Fields{
-				"topic": n.GameId + "_log_referee",
+				"topic":           n.GameId + "_log_referee",
 				"NSQLOOKUPD_ADDR": conf.NSQLOOKUPD_ADDR,
-				"err":   err.Error(),
+				"err":             err.Error(),
 			}).Info("Referee log nsq consumer connected to nsqLookupd failed.")
 			return
 		}
 		select {
 		case <-refereeLogHandler.TransFinished:
-			logrus.Info("refereeLogHandler trans finished" + n.GameId)
 			return
 		case <-time.After(conf.MAX_PULL_DATA_TIME):
 			return
@@ -280,8 +280,8 @@ func (n *NsqTrans) PullGameDataAndStore() {
 func (n *NsqTrans) storeServerErrorInPullDataFromNsq() {
 	serverErrorGameResult := &model.MatchResultItem{
 		GameID:      n.GameId,
-		StartTime: time.Now().Unix(),
-		EndTime: time.Now().Unix(),
+		StartTime:   time.Now().Unix(),
+		EndTime:     time.Now().Unix(),
 		ServerError: true,
 	}
 	serverErrorGameResultBinary, _ := json.Marshal(serverErrorGameResult)
@@ -300,6 +300,17 @@ func (n *NsqTrans) Stop() {
 	n.Player1LogFile.Close()
 	n.Player2LogFile.Close()
 	n.RefereeLogFile.Close()
+
+	// close match pod
+	deletePolicyPod := metav1.DeletePropagationForeground
+	if err := n.PodClient.Delete("match-game-"+n.GameId, &metav1.DeleteOptions{
+		PropagationPolicy: &deletePolicyPod,
+	}); err != nil {
+		logrus.WithFields(logrus.Fields{
+			"gameId": n.GameId,
+			"err":    err.Error(),
+		}).Info("Delete match pod failed.")
+	}
 }
 
 // TODO use waitgroup

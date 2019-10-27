@@ -2,7 +2,6 @@ package nsqtrans
 
 import (
 	"github.com/nsqio/go-nsq"
-	"github.com/sirupsen/logrus"
 	"os"
 )
 
@@ -19,9 +18,7 @@ func newLogHandler(logFile *os.File) *logHandler {
 }
 
 func (h *logHandler) HandleMessage(msg *nsq.Message) error {
-	logrus.Info("log handle msg ing...")
 	if string(msg.Body) == "EOFEOF" {
-		logrus.Info("eof eof ")
 		h.TransFinished <- true
 	} else {
 		h.LogFile.Write(append(msg.Body, '\n'))

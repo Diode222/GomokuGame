@@ -11,7 +11,7 @@ const (
 )
 
 var (
-	NSQ_PUB_ADDR   string = "10.244.0.1" + NSQ_PUB_PORT
-	NSQD_PULL_ADDR string = "10.244.0.1" + NSQD_PORT
-	NSQLOOKUPD_ADDR     string = "10.244.0.2" + NSQLOOKUPD_PORT
+	NSQ_PUB_ADDR    string = "10.244.0.1" + NSQ_PUB_PORT
+	NSQD_PULL_ADDR  string = "10.244.0.1" + NSQD_PORT
+	NSQLOOKUPD_ADDR string = "10.244.0.2" + NSQLOOKUPD_PORT
 )

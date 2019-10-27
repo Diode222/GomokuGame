@@ -9,11 +9,16 @@ GomokuGame是自动对弈平台的后端业务层，管理用户注册登陆，�
 
 ### API
 
-若为post请求，所有参数均为body的k/v对。
+若为post请求，应区分post body中的参数与query参数。
 
-http://127.0.0.1:8080/register ([post]; params: 1. user_name, 2. password, 3. warehouse_addr)
+##### 注册
+http://127.0.0.1:8080/register ([post]; postparams: 1. user_name, 2. password, 3. warehouse_addr)
 
-http://127.0.0.1:8080/login ([post]; params: 1. user_name, 2. password; return: token (jwt生成的token，过期时间为10天))
+##### 登陆
+http://127.0.0.1:8080/login ([post]; postparams: 1. user_name, 2. password; return: token (jwt生成的token，过期时间为10天))
+
+##### 开启一局对战
+http://127.0.0.1:8080/game/start ([get]; header: 1. token, 2. Content-type: application/x-www-form-urlencoded; query: 1. player1_first_hand (true/false, 选择先手还是后手), 2. max_thinking_time (本局游戏单步最大思考时间), 3. enemy_user_name (optional，挑战选手的用户名)
 
 ......
 

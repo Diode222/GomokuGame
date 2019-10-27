@@ -38,7 +38,7 @@ func (g *GameStartCtrl) Start(c *gin.Context) {
 	var player1ImageAddr string
 	var player2ImageAddr string
 
-	userToken := c.PostForm("token")
+	userToken := c.GetHeader("Authorization")
 	player1FirstHand := c.Query("player1_first_hand")
 	maxThinkingTime := c.Query("max_thinking_time")
 	enemyUserName := c.Query("enemy_user_name")
@@ -88,7 +88,7 @@ func (g *GameStartCtrl) Start(c *gin.Context) {
 	g.GameResultDao.SetTempGamingStatusInRedis(c.Request.Context(), strconv.FormatInt(gameID, 10))
 
 	// init nsq transmission consumers and topics
-	nsqTransClient, err := nsqtrans.NewNsqTrans(gameID)
+	nsqTransClient, err := nsqtrans.NewNsqTrans(gameID, g.PodClient)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"gameID": gameID,
