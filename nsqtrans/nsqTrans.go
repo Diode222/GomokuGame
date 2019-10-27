@@ -243,6 +243,7 @@ func (n *NsqTrans) PullGameDataAndStore() {
 	logrus.Println("length of operationsJson: " + strconv.Itoa(len(operationsJson)))
 	gameReulstItem := &model.MatchResultItem{
 		GameID:             gameReulst.GameID,
+		GameStatus:         false,
 		BoardLength:        gameReulst.BoardLength,
 		BoardHeight:        gameReulst.BoardHeight,
 		Player1ID:          gameReulst.Player1ID,
@@ -257,7 +258,7 @@ func (n *NsqTrans) PullGameDataAndStore() {
 		ServerError:        gameReulst.ServerError,
 		Player1LogFilePath: n.Player1LogFilePath,
 		Player2LogFilePath: n.Player2LogFilePath,
-		RefereeLogFilePaht: n.RefereeLogFilePath,
+		RefereeLogFilePath: n.RefereeLogFilePath,
 	}
 
 	gameResultItemJson, err := json.Marshal(gameReulstItem)
@@ -280,6 +281,7 @@ func (n *NsqTrans) PullGameDataAndStore() {
 func (n *NsqTrans) storeServerErrorInPullDataFromNsq() {
 	serverErrorGameResult := &model.MatchResultItem{
 		GameID:      n.GameId,
+		GameStatus:  false,
 		StartTime:   time.Now().Unix(),
 		EndTime:     time.Now().Unix(),
 		ServerError: true,

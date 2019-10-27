@@ -22,7 +22,8 @@ func InitRouter() {
 	})
 
 	gameRouter := router.Group("/game", middleware.UserMiddleware())
-	gameRouter.GET("/start", h.GameStartCtrl.Start)
+	gameRouter.GET("/start", h.GameCtrl.Start)
+	gameRouter.GET("/result", h.GameCtrl.GetResult)
 
 	router.Run(":8080")
 }

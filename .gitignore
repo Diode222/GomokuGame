@@ -2,3 +2,4 @@
 .idea/
 #app/conf/mysql_conf.go
 #app/conf/redis_conf.go
+main

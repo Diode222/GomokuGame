@@ -4,6 +4,7 @@ import (
 	"GomokuGame/dao/gameId"
 	"GomokuGame/dao/gameResult"
 	"GomokuGame/dao/user"
+	"GomokuGame/format"
 	"GomokuGame/kube"
 	"GomokuGame/nsqtrans"
 	"GomokuGame/utils/json"
@@ -14,15 +15,15 @@ import (
 	"strconv"
 )
 
-type GameStartCtrl struct {
+type GameCtrl struct {
 	GameIdDao     gameId.GameIdDaoInterface
 	UserDao       user.UserDaoInterface
 	GameResultDao gameResult.GameResultDaoInterface
 	PodClient     coreV1.PodInterface
 }
 
-func NewGameStartCtrl(gameIdDao gameId.GameIdDaoInterface, userDao user.UserDaoInterface, gameResultDao gameResult.GameResultDaoInterface, podClient coreV1.PodInterface) *GameStartCtrl {
-	return &GameStartCtrl{
+func NewGameCtrl(gameIdDao gameId.GameIdDaoInterface, userDao user.UserDaoInterface, gameResultDao gameResult.GameResultDaoInterface, podClient coreV1.PodInterface) *GameCtrl {
+	return &GameCtrl{
 		GameIdDao:     gameIdDao,
 		UserDao:       userDao,
 		GameResultDao: gameResultDao,
@@ -30,7 +31,7 @@ func NewGameStartCtrl(gameIdDao gameId.GameIdDaoInterface, userDao user.UserDaoI
 	}
 }
 
-func (g *GameStartCtrl) Start(c *gin.Context) {
+func (g *GameCtrl) Start(c *gin.Context) {
 	var player1Name string
 	var player2Name string
 	//var player1WarehouseAddr string
@@ -119,4 +120,20 @@ func (g *GameStartCtrl) Start(c *gin.Context) {
 	go nsqTransClient.PullGameDataAndStore()
 
 	c.String(http.StatusOK, json.JsonResponse(http.StatusOK, "Match started"))
+}
+
+func (g *GameCtrl) GetResult(c *gin.Context) {
+	gameID := c.Query("game_id")
+
+	gameResultModel, err := g.GameResultDao.GetGameResult(c.Request.Context(), gameID)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"gameID": gameID,
+			"err":    err.Error(),
+		}).Info("Get game result failed.")
+		c.String(http.StatusInternalServerError, json.JsonResponse(http.StatusInternalServerError, "Get game result failed."))
+		return
+	}
+	gameResultFormat := format.GameResultFormatter(gameResultModel)
+	c.String(http.StatusOK, json.JsonResponse(http.StatusOK, gameResultFormat))
 }

@@ -20,6 +20,9 @@ http://127.0.0.1:8080/login ([post]; postparams: 1. user_name, 2. password; retu
 ##### 开启一局对战
 http://127.0.0.1:8080/game/start ([get]; header: 1. token, 2. Content-type: application/x-www-form-urlencoded; query: 1. player1_first_hand (true/false, 选择先手还是后手), 2. max_thinking_time (本局游戏单步最大思考时间), 3. enemy_user_name (optional，挑战选手的用户名)
 
+##### 获取一局对战的游戏结果
+http://127.0.0.1:8080/game/result ([get]; header: 1. token, 2. Content-type: application/x-www-form-urlencoded; query 1. game_id (表示一局对战的唯一id))
+
 ......
 
 ### 相关项目传送门

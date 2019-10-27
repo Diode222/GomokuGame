@@ -5,6 +5,7 @@ import "github.com/jinzhu/gorm"
 type MatchResultItem struct {
 	gorm.Model
 	GameID             string `gorm:"primary_key"`
+	GameStatus         bool   // true: is still gaming, false: game has finished
 	BoardLength        int
 	BoardHeight        int
 	Player1ID          string
@@ -19,5 +20,5 @@ type MatchResultItem struct {
 	ServerError        bool   `gorm:"not null"` // Server failure, game is invalid
 	Player1LogFilePath string
 	Player2LogFilePath string
-	RefereeLogFilePaht string
+	RefereeLogFilePath string
 }

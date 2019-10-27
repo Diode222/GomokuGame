@@ -11,8 +11,8 @@ import (
 )
 
 type handler struct {
-	UserCtrl      *controller.UserCtrl
-	GameStartCtrl *controller.GameStartCtrl
+	UserCtrl *controller.UserCtrl
+	GameCtrl *controller.GameCtrl
 }
 
 var h *handler
@@ -26,7 +26,7 @@ func GetHandler() *handler {
 					db.GetDB(),
 				),
 			),
-			GameStartCtrl: controller.NewGameStartCtrl(
+			GameCtrl: controller.NewGameCtrl(
 				gameId.NewGameIdDao(db.GetDB().Redis),
 				user.NewUserDao(db.GetDB()),
 				gameResult.NewGameResultDao(db.GetDB()),

@@ -16,7 +16,7 @@ type MatchResultNsq struct {
 	ServerError        bool         `json:"server_error"`          // Server failure, game is invalid
 	Player1LogFilePath string       `json:"player1_log_file_path,omitempty"`
 	Player2LogFilePath string       `json:"player2_log_file_path,omitempty"`
-	RefereeLogFilePaht string       `json:"referee_log_file_path,omitempty"`
+	RefereeLogFilePath string       `json:"referee_log_file_path,omitempty"`
 }
 
 const (
