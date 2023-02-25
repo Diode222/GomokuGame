@@ -16,8 +16,7 @@ require (
 	github.com/ugorji/go v1.1.7 // indirect
 	golang.org/x/net v0.0.0-20191021144547-ec77196f6094 // indirect
 	golang.org/x/sys v0.0.0-20191025090151-53bf42e6b339 // indirect
-	gopkg.in/yaml.v2 v2.2.4 // indirect
 	k8s.io/api v0.0.0-20191003000013-35e20aa79eb8
-	k8s.io/apimachinery v0.0.0-20190913080033-27d36303b655
+	k8s.io/apimachinery v0.15.7
 	k8s.io/client-go v0.0.0-20191003000419-f68efa97b39e
 )
